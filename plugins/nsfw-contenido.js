@@ -7,7 +7,16 @@ const contenidoNSFW = {
   pack3: { label: '_🥵 aqui tiene mi Pack 😏_', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/packmen.json', aliases: [] },
   tetas: { label: '🥵 dame lechita de hay 🥵', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/tetas.json', aliases: ['pechos'] },
   videoxxx: { label: '_*ᴅɪsғʀᴜᴛᴀ ᴅᴇʟ ᴠɪᴅᴇᴏ 🥵_', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/videoxxxc.json', aliases: ['vídeoxxx'] },
-  videoxxxlesbi: { label: '_*ᴅɪsғʀᴜᴛᴀ ᴅᴇʟ ᴠɪᴅᴇᴏ 🥵_', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/videoxxxc2.json', aliases: ['videolesbixxx', 'pornolesbivid'] },
+  videoxxxlesbi: {
+    label: '_*ᴅɪsғʀᴜᴛᴀ ᴅᴇʟ ᴠɪᴅᴇᴏ BRIAN 🥵_',
+    type: 'api',
+    api: 'https://nsfw13.p.rapidapi.com/invoke',
+    aliases: ['videolesbixxx', 'pornolesbivid'],
+    rapidapi: {
+      key: '07e5e1e8dbmsh1085ff5676e9c03p18c055jsnd578b7f488b0',
+      host: 'nsfw13.p.rapidapi.com'
+    }
+  },
   pornololi: { label: '🥵', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/pornololi.json', aliases: ['pornololi'] },
   yuri: { label: '👩‍❤️‍👩 Yuri', type: 'json', url: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/yuri.json', aliases: [] },
   yaoi: { label: '👨‍❤️‍👨 Yaoi', type: 'api', api: 'https://nekobot.xyz/api/image?type=yaoi', field: 'message', aliases: [] },
@@ -54,18 +63,37 @@ await conn.sendFile(m.chat, url, 'waifu.jpg', item.label, m)
 return
 }
 
-if (item.type === 'api') {
-const res = await fetch(item.api)
-const contentType = res.headers.get('content-type') || ''
-if (contentType.startsWith('image/')) {
-const buffer = await res.buffer()
-await conn.sendFile(m.chat, buffer, 'img.jpg', item.label, m)
-return
+m.reply('⏳ Buscando video...')
+if (item.type === 'api' && item.rapidapi) {
+  const options = {
+    method: 'POST',
+    url: item.api,
+    headers: {
+      'x-rapidapi-key': item.rapidapi.key,
+      'x-rapidapi-host': item.rapidapi.host,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data: new URLSearchParams({})
+  };
+  const { data } = await axios.request(options);
+  // Ajusta aquí según la respuesta de la API
+  const videoUrl = data.url || data.result || data.link || data.video || data[0];
+  if (!videoUrl) return m.reply('❌ No se encontró video en la API.');
+  await conn.sendFile(m.chat, videoUrl, 'nsfw.mp4', item.label, m);
+  return;
 }
-const json = await res.json()
-const url = item.field ? json[item.field] : json.url || json.message
-await conn.sendFile(m.chat, url, 'nsfw.jpg', item.label, m)
-return
+if (item.type === 'api') {
+  const res = await fetch(item.api);
+  const contentType = res.headers.get('content-type') || '';
+  if (contentType.startsWith('image/')) {
+    const buffer = await res.buffer();
+    await conn.sendFile(m.chat, buffer, 'img.jpg', item.label, m);
+    return;
+  }
+  const json = await res.json();
+  const url = item.field ? json[item.field] : json.url || json.message;
+  await conn.sendFile(m.chat, url, 'nsfw.jpg', item.label, m);
+  return;
 }
 m.reply('❌ Fuente NSFW no soportada.')
 } catch (e) {
