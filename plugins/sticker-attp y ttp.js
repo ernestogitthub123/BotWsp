@@ -2,13 +2,14 @@ import { sticker } from '../lib/sticker.js'
 import { textToSticker, textToAnimatedSticker } from '../lib/text2sticker.js'
 import { db } from '../lib/postgres.js';
 let handler = async(m, { conn, text, args, usedPrefix, command }) => {
-const userResult = await db.query('SELECT sticker_packname, sticker_author FROM usuarios WHERE id = $1', [m.sender]);
-const user = userResult.rows[0] || {};
-let f = user.sticker_packname || global.info.packname;
-let g = (user.sticker_packname && user.sticker_author ? user.sticker_author : (user.sticker_packname && !user.sticker_author ? '' : global.info.author));
-if (!text) return m.reply(`⚠️ 𝙀𝙨𝙘𝙧𝙞𝙗𝙖 𝙥𝙖𝙧𝙖 𝙦𝙪𝙚 𝙚𝙡 𝙩𝙚𝙭𝙩𝙤 𝙨𝙚 𝙘𝙤𝙣𝙫𝙞𝙚𝙧𝙩𝙖 𝙚𝙡 𝙨𝙩𝙞𝙘𝙠𝙚𝙧\n𝙀𝙟𝙚𝙢𝙥𝙡𝙤\n*${usedPrefix + command}* Nuevo Sticker`)
-let teks = encodeURI(text)
-conn.fakeReply(m.chat, `Calma crack estoy haciendo tu texto a sticker 👏\n\n> *Esto puede demorar unos minutos*`, '0@s.whatsapp.net', `No haga spam gil`, 'status@broadcast')
+try {
+  const userResult = await db.query('SELECT sticker_packname, sticker_author FROM usuarios WHERE id = $1', [m.sender]);
+  const user = userResult.rows[0] || {};
+  let f = user.sticker_packname || global.info.packname;
+  let g = (user.sticker_packname && user.sticker_author ? user.sticker_author : (user.sticker_packname && !user.sticker_author ? '' : global.info.author));
+  if (!text) return m.reply(`⚠️ 𝙀𝙨𝙘𝙧𝙞𝙗𝙖 𝙥𝙖𝙧𝙖 𝙦𝙪𝙚 𝙚𝙡 𝙩𝙚𝙭𝙩𝙤 𝙨𝙚 𝙘𝙤𝙣𝙫𝙞𝙚𝙧𝙩𝙖 𝙚𝙡 𝙨𝙩𝙞𝙘𝙠𝙚𝙧\n𝙀𝙟𝙚𝙢𝙥𝙡𝙤\n*${usedPrefix + command}* Nuevo Sticker`)
+  let teks = encodeURI(text)
+  conn.fakeReply(m.chat, `Calma crack estoy haciendo tu texto a sticker 👏\n\n> *Esto puede demorar unos minutos*`, '0@s.whatsapp.net', `No haga spam gil`, 'status@broadcast')
 
 if (command == 'attp') {
 if (text.length > 40) return m.reply(`⚠️ El texto no puede tener más de 40 caracteres.\n\n✍️ Intenta con algo más corto.`)
@@ -21,20 +22,21 @@ conn.sendFile(m.chat, stiker, 'sticker.webp', '',m, true, { contextInfo: { 'forw
 }
 
 if (command == 'ttp' || command == 'brat') {
-	if (text.length > 300) return m.reply(`⚠️ El texto no puede tener más de 300 caracteres.\n\n✍️ Intenta con algo más corto.`)
-	try {
-		let webpBuffer = await textToSticker(text, {
-			width: 512,
-			height: 512,
-			fontSize: 64,
-			fontFamily: 'Arial',
-			bgColor: 'rgba(0,0,0,0)',
-			textColor: '#fff'
-		});
-		conn.sendFile(m.chat, webpBuffer, 'sticker.webp', '', m, true, { contextInfo: { 'forwardingScore': 200, 'isForwarded': false, externalAdReply: { showAdAttribution: false, title: info.wm, body: info.vs, mediaType: 2, sourceUrl: info.md, thumbnail: m.pp }}}, { quoted: m });
-	} catch (e) {
-		m.reply('Ocurrió un error generando el sticker localmente.');
-	}
+  if (text.length > 300) return m.reply(`⚠️ El texto no puede tener más de 300 caracteres.\n\n✍️ Intenta con algo más corto.`)
+  try {
+    let webpBuffer = await textToSticker(text, {
+      width: 512,
+      height: 512,
+      fontSize: 64,
+      fontFamily: 'Arial',
+      bgColor: '#fff', // Fondo blanco
+      textColor: '#000' // Texto negro
+    });
+    conn.sendFile(m.chat, webpBuffer, 'sticker.webp', '', m, true, { contextInfo: { 'forwardingScore': 200, 'isForwarded': false, externalAdReply: { showAdAttribution: false, title: info.wm, body: info.vs, mediaType: 2, sourceUrl: info.md, thumbnail: m.pp }}}, { quoted: m });
+  } catch (e) {
+    m.reply('❌ Error generando el sticker localmente: ' + (e?.message || e));
+    console.error('Error brat:', e);
+  }
 }
 
 if (command == 'brat2' || command == 'bratvid') {
@@ -45,16 +47,21 @@ if (command == 'brat2' || command == 'bratvid') {
       height: 512,
       fontSize: 64,
       fontFamily: 'Arial',
-      bgColor: '#000',
-      textColor: '#fff',
-      frames: 10,
-      delay: 100
+      bgColor: '#fff', // Fondo blanco
+      textColor: '#000', // Texto negro
+      frames: 15,
+      delay: 200
     });
     conn.sendFile(m.chat, webpBuffer, 'sticker.webp', '', m, true, { contextInfo: { 'forwardingScore': 200, 'isForwarded': false, externalAdReply: { showAdAttribution: false, title: info.wm, body: info.vs, mediaType: 2, sourceUrl: info.md, thumbnail: m.pp }}}, { quoted: m });
   } catch (e) {
-    console.error(e);
-    m.reply('Ocurrió un error generando el sticker animado localmente.');
+    m.reply('❌ Error generando el sticker animado localmente: ' + (e?.message || e));
+    console.error('Error bratvid:', e);
   }
+}
+} catch (e) {
+  m.reply('❌ Error general en el handler: ' + (e?.message || e));
+  console.error('Error handler:', e);
+}
 }
 }
 handler.help = ['attp', 'brat', 'bratvid'];
