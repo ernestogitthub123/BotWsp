@@ -38,8 +38,12 @@ return
 
 if (item.type === 'json') {
 const { data } = await axios.get(item.url)
-const img = data[Math.floor(Math.random() * data.length)]
-await conn.sendFile(m.chat, img, 'nsfw.jpg', item.label, m)
+const file = data[Math.floor(Math.random() * data.length)]
+if (file.endsWith('.mp4')) {
+  await conn.sendFile(m.chat, file, 'nsfw.mp4', item.label, m)
+} else {
+  await conn.sendFile(m.chat, file, 'nsfw.jpg', item.label, m)
+}
 return
 }
 
