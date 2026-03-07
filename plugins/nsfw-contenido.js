@@ -66,14 +66,12 @@ return
 m.reply('⏳ Buscando video...')
 if (item.type === 'api' && item.rapidapi) {
   const options = {
-    method: 'POST',
+    method: 'GET',
     url: item.api,
     headers: {
       'x-rapidapi-key': item.rapidapi.key,
-      'x-rapidapi-host': item.rapidapi.host,
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    data: new URLSearchParams({})
+      'x-rapidapi-host': item.rapidapi.host
+    }
   };
   const { data } = await axios.request(options);
   // Ajusta aquí según la respuesta de la API
