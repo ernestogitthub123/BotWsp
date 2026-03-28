@@ -1,21 +1,21 @@
 import { watchFile, unwatchFile } from 'fs'
 import chalk from 'chalk'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 import fs from 'fs'
 
 //owner
 global.owner = [
-['573226873710'],
 ['5493513117202'],
-['593968585383'],
+['5493515925657'],
+['5492392563251'],
 ['5219999699999']
 ]
 
 //Información 
 globalThis.info = {
-wm: "𝙇𝙤𝙡𝙞𝘽𝙤𝙩-𝙈𝘿",
+wm: "JOAKING-PRO-𝙈𝘿",
 vs: "2.0.0",
-packname: "𝗦𝗧𝗜𝗖𝗞𝗘𝗥𝗦❤️‍🔥 - LoliBot\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+packname: "𝗦𝗧𝗜𝗖𝗞𝗘𝗥𝗦❤️‍🔥 - BOT-JOA\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
 author: "Owner: @joako_freire\n• Dueño: @joako_freire",
 apis: "https://api.delirius.store",
 apikey: "GataDios",
@@ -44,5 +44,5 @@ let file = fileURLToPath(import.meta.url)
 watchFile(file, () => {
   unwatchFile(file)
   console.log(chalk.redBright("Update 'config.js'"))
-  import(`${file}?update=${Date.now()}`)
+  import(`${pathToFileURL(file).href}?update=${Date.now()}`)
 })

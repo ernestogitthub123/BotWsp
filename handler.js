@@ -330,7 +330,8 @@ const botType = isMainBot ? "oficial" : "subbot";
 if (botConfig.tipo !== botType) {
 await db.query(`UPDATE subbots SET tipo = $1 WHERE id = $2`, [botType, botId.replace(/:\d+/, "")]);
 }
-const prefijo = Array.isArray(botConfig.prefix) ? botConfig.prefix : [botConfig.prefix];
+const prefijo = (Array.isArray(botConfig.prefix) ? botConfig.prefix : [botConfig.prefix])
+  .filter(prefix => typeof prefix === 'string');
 const modo = botConfig.mode || "public";
 m.isGroup = chatId.endsWith("@g.us");
 
@@ -428,7 +429,11 @@ text = text.trim();
 //if (!text) return;
 m.text = text;
 
-const usedPrefix = prefijo.find(p => text.startsWith(p)) || "";
+const configuredPrefixes = prefijo
+  .filter(prefix => prefix.length > 0)
+  .sort((a, b) => b.length - a.length);
+const fallbackPrefix = text.match(/^[./#!$%&]/)?.[0] || "";
+const usedPrefix = configuredPrefixes.find(prefix => text.startsWith(prefix)) || fallbackPrefix || "";
 const withoutPrefix = text.slice(usedPrefix.length).trim();
 const [commandName, ...argsArr] = withoutPrefix.split(/[\n\s]+/); 
 const command = (commandName || "").toLowerCase();
@@ -581,6 +586,10 @@ if (!matchedPlugin || !matchedPlugin.customPrefix) return;
 }
 //if (!usedPrefix && !command) return;
 
+if (usedPrefix && command) {
+console.log(`[CMD] ${m.sender} -> ${usedPrefix}${command}`);
+}
+
 for (const plugin of plugins) {
 let match = false;
 
@@ -700,7 +709,7 @@ if (plugin.register) {
 try {
 const result = await db.query('SELECT * FROM usuarios WHERE id = $1', [m.sender]);
 const user = result.rows[0];
-if (!user || user.registered !== true) return m.reply("「NO ESTAS REGISTRADO」\n\nPA NO APARECES EN MI BASE DE DATOS ✋🥸🤚\n\nPara poder usarme escribe el siguente comando\n\nComando: #reg nombre.edad\nEjemplo: #reg elrebelde.21");
+if (!user || user.registered !== true) return m.reply("「NO ESTAS REGISTRADO」\n\nPA NO APARECES EN MI BASE DE DATOS ✋🥸🤚\n\nPara poder usarme escribe el siguente comando\n\nComando: #reg nombre.edad\nEjemplo: #reg Joaking.23");
 } catch (e) {
 console.error(e);
 }}
@@ -852,5 +861,5 @@ let file = fileURLToPath(import.meta.url);
 watchFile(file, () => {
   unwatchFile(file);
   console.log(chalk.redBright('Update \'handler.js\''));
-  import(`${file}?update=${Date.now()}`);
+  import(`${pathToFileURL(file).href}?update=${Date.now()}`);
 });

@@ -126,6 +126,7 @@ browser: ['Windows', 'Chrome'],
 auth: { creds: state.creds,
 keys: baileys.makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' }))
 },
+emitOwnEvents: true,
 markOnlineOnConnect: false, 
 generateHighQualityLinkPreview: true, 
 syncFullHistory: false,
@@ -175,11 +176,33 @@ console.log(chalk.yellow('Código de emparejamiento:'), chalk.greenBright(code))
 }
 
 sock.ev.on("messages.upsert", async ({ messages, type }) => {
-if (type !== "notify") return;
+console.log(`[UPSERT][main] type=${type} count=${messages?.length || 0}`);
 for (const msg of messages) {
 if (!msg.message) continue;
-if (msg.messageTimestamp && (Date.now()/1000 - msg.messageTimestamp > 120)) continue; 
-if(msg.key.id.startsWith('NJX-') || msg.key.id.startsWith('Lyru-') || msg.key.id.startsWith('EvoGlobalBot-') || msg.key.id.startsWith('BAE5') && msg.key.id.length === 16 || msg.key.id.startsWith('3EB0') && msg.key.id.length === 12 || msg.key.id.startsWith('3EB0') || msg.key.id.startsWith('3E83') || msg.key.id.startsWith('3E38') && (msg.key.id.length === 20 || msg.key.id.length === 22) || msg.key.id.startsWith('B24E') || msg.key.id.startsWith('8SCO') && msg.key.id.length === 20 || msg.key.id.startsWith('FizzxyTheGreat-')) return
+const rawTimestamp = Number(msg.messageTimestamp || 0);
+if (rawTimestamp && (Date.now() / 1000 - rawTimestamp > 86400)) {
+  console.log(`[UPSERT][main][skip-old] id=${msg.key?.id || ''} ts=${rawTimestamp}`);
+  continue;
+}
+const messageId = msg.key?.id || '';
+const ignoredByPrefix = (
+  messageId.startsWith('NJX-') ||
+  messageId.startsWith('Lyru-') ||
+  messageId.startsWith('EvoGlobalBot-') ||
+  (messageId.startsWith('BAE5') && messageId.length === 16) ||
+  (messageId.startsWith('8SCO') && messageId.length === 20) ||
+  messageId.startsWith('FizzxyTheGreat-')
+);
+if (ignoredByPrefix && msg.key?.fromMe) continue;
+
+const preview = (
+  msg.message?.conversation ||
+  msg.message?.extendedTextMessage?.text ||
+  msg.message?.imageMessage?.caption ||
+  msg.message?.videoMessage?.caption ||
+  ''
+).slice(0, 80);
+console.log(`[UPSERT][main] id=${messageId} fromMe=${!!msg.key?.fromMe} chat=${msg.key?.remoteJid || ''} text=${JSON.stringify(preview)}`);
 try {
 //const { handler } = await import("./handler.js");
 await handler(sock, msg);
