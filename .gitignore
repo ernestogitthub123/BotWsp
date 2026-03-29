@@ -1,8 +1,9 @@
 .npm/
 .git/
-package-lock.json
-yarn.lock 
 node_modules/
-jadibot/
-src/ 
 tmp/
+BotSession/
+jadibot/
+*.log
+.env
+.env.*
