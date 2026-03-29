@@ -455,6 +455,29 @@ const isCreator = fixedOwners.includes(m.sender) ||
   global.owner.map(([v]) => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender);
 const config = await getSubbotConfig(botId);
 let isOwner = isCreator || senderJid === botJid || (config.owners || []).includes(senderJid);
+const plugins = Object.values(global.plugins || {});
+
+for (const plugin of plugins) {
+if (typeof plugin.before === 'function') {
+try {
+const result = await plugin.before(m, { conn, isOwner });
+if (result === false) return;
+} catch (e) {
+console.error(chalk.red(e));
+}}}
+
+if (modo === "private" && senderJid !== botJid && !isCreator) return;
+
+const matchedPlugin = plugins.find(p => {
+const raw = m.originalText
+return typeof p.customPrefix === 'function'
+? p.customPrefix(raw)
+: p.customPrefix instanceof RegExp
+? p.customPrefix.test(raw) : false
+})
+
+// Para mensajes comunes sin prefijo ni customPrefix, evitamos toda la parte pesada.
+if (!usedPrefix && (!command || !matchedPlugin || !matchedPlugin.customPrefix)) return;
 
 let metadata = { participants: [] };
 if (m.isGroup) {
@@ -558,28 +581,6 @@ await db.query(`INSERT INTO chats (id)
 } catch (err) {
 console.error(err);
 }
-
-const plugins = Object.values(global.plugins || {});
-
-for (const plugin of plugins) {
-if (typeof plugin.before === 'function') {
-try {
-const result = await plugin.before(m, { conn, isOwner });
-if (result === false) return;
-} catch (e) {
-console.error(chalk.red(e));
-}}
-}
-
-if (modo === "private" && senderJid !== botJid && !isCreator) return;
-
-const matchedPlugin = plugins.find(p => {
-const raw = m.originalText
-return typeof p.customPrefix === 'function'
-? p.customPrefix(raw)
-: p.customPrefix instanceof RegExp
-? p.customPrefix.test(raw) : false
-})
 
 if (!usedPrefix) {
 if (!matchedPlugin || !matchedPlugin.customPrefix) return;
