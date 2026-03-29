@@ -8,10 +8,15 @@ const chat = chatres.rows[0]
 if (!chat?.autolevelup) return
 const res = await m.db.query('SELECT exp, level, role FROM usuarios WHERE id = $1', [m.sender])
 const user = res.rows[0]
+if (!user) return
 
-const before = user.level
-let currentLevel = user.level
-while (canLevelUp(currentLevel, user.exp, multiplier)) {
+const exp = Number(user.exp) || 0
+const initialLevel = Number(user.level) || 0
+user.role = user.role || getRole(initialLevel).name
+
+const before = initialLevel
+let currentLevel = initialLevel
+while (canLevelUp(currentLevel, exp, multiplier)) {
 currentLevel++
 }
 
