@@ -2,10 +2,10 @@ import axios from 'axios'
 import fetch from 'node-fetch'
 
 const contenidoNSFW = {
-  pack: { label: '_🥵 aqui tiene mi Pack 😏_', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/pack.json', aliases: [] },
-  pack2: { label: '_🥵 aqui tiene mi Pack 😏_', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/packgirl.json', aliases: [] },
-  pack3: { label: '_🥵 aqui tiene mi Pack 😏_', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/packmen.json', aliases: [] },
-  tetas: { label: '🥵 dame lechita de hay 🥵', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/tetas.json', aliases: ['pechos'] },
+  pack: { label: '_🥵 aqui tiene el pack de Memi 😏_', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/pack.json', aliases: [] },
+  pack2: { label: '_🥵 aqui tiene el pack de Brian 😏_', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/packgirl.json', aliases: [] },
+  pack3: { label: '_🥵 aqui tiene el pack de @ 😏_', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/packmen.json', aliases: [] },
+  tetas: { label: '🥵 dame lechita de ahí 🥵', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/tetas.json', aliases: ['pechos'] },
   videoxxx: { label: '_*ᴅɪsғʀᴜᴛᴀ ᴅᴇʟ ᴠɪᴅᴇᴏ 🥵_', type: 'json', url: 'https://raw.githubusercontent.com/elrebelde21/The-LoliBot-MD2/main/src/nsfw/videoxxxc.json', aliases: ['vídeoxxx'] },
   videoxxxlesbi: {
     label: '_*ᴅɪsғʀᴜᴛᴀ ᴅᴇʟ ᴠɪᴅᴇᴏ BRIAN 🥵_',

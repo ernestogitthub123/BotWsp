@@ -92,14 +92,14 @@ isForwarded: true,
 forwardingScore: 999999,
 forwardedNewsletterMessageInfo: {
 newsletterJid: ["120363321650707484@newsletter", "120363368880733138@newsletter", "120363301598733462@newsletter"].getRandom(),
-newsletterName: "LoliBot ✨️"
+newsletterName: "Joaking ✨️"
 }}}, { quoted: null })
 } else {
 await conn.sendMessage(id, { text: msg,
 contextInfo: {
 forwardedNewsletterMessageInfo: {
 newsletterJid: ["120363321650707484@newsletter", "120363368880733138@newsletter", "120363301598733462@newsletter"].getRandom(),
-newsletterName: "LoliBot ✨️"
+newsletterName: "Joaking ✨️"
 },
 forwardingScore: 9999999,
 isForwarded: true,
@@ -147,14 +147,14 @@ isForwarded: true,
 forwardingScore: 999999,
 forwardedNewsletterMessageInfo: {
 newsletterJid: ["120363321650707484@newsletter", "120363368880733138@newsletter", "120363301598733462@newsletter"].getRandom(),
-newsletterName: "LoliBot ✨️"
+newsletterName: "Joaking ✨️"
 }}}, { quoted: null })
 } else {
 await conn.sendMessage(id, { text: msg,
 contextInfo: {
 forwardedNewsletterMessageInfo: {
 newsletterJid: ["120363321650707484@newsletter", "120363368880733138@newsletter", "120363301598733462@newsletter"].getRandom(),
-newsletterName: "LoliBot ✨️"
+newsletterName: "Joaking ✨️"
 },
 forwardingScore: 9999999,
 isForwarded: true,
@@ -184,7 +184,7 @@ await conn.sendMessage(id, { text: msg,
 contextInfo:{  
 forwardedNewsletterMessageInfo: { 
 newsletterJid: ["120363321650707484@newsletter", "120363368880733138@newsletter", "120363301598733462@newsletter"].getRandom(),
-newsletterName: "LoliBot ✨️" },
+newsletterName: "Joaking ✨️" },
 forwardingScore: 9999999,  
 isForwarded: true,   
 mentionedJid: [participant, author],
@@ -214,7 +214,7 @@ await conn.sendMessage(id, { text: msg,
 contextInfo:{  
 forwardedNewsletterMessageInfo: { 
 newsletterJid: ["120363321650707484@newsletter", "120363368880733138@newsletter", "120363301598733462@newsletter"].getRandom(),
-newsletterName: "LoliBot ✨️" },
+newsletterName: "Joaking ✨️" },
 forwardingScore: 9999999,  
 isForwarded: true,   
 mentionedJid: [participant, author],
@@ -274,7 +274,7 @@ isForwarded: true,
 forwardingScore: 1,
 forwardedNewsletterMessageInfo: {
 newsletterJid: ["120363321650707484@newsletter", "120363368880733138@newsletter", "120363301598733462@newsletter"].getRandom(),
-newsletterName: "LoliBot ✨️",
+newsletterName: "Joaking ✨️",
 serverMessageId: 1
 }}
 });
@@ -295,7 +295,7 @@ isForwarded: true,
 forwardingScore: 1,
 forwardedNewsletterMessageInfo: {
 newsletterJid: ["120363321650707484@newsletter", "120363368880733138@newsletter", "120363301598733462@newsletter"].getRandom(),
-newsletterName: "LoliBot ✨️",
+newsletterName: "Joaking ✨️",
 serverMessageId: 1
 }}
 });
@@ -357,7 +357,7 @@ isForwarded: true,
 forwardingScore: 1,
 forwardedNewsletterMessageInfo: {
 newsletterJid: "120363321650707484@newsletter",
-newsletterName: "LoliBot ✨️"
+newsletterName: "Joaking ✨️"
 }};
 return await conn.sendMessage(chatId, { text, contextInfo }, { quoted: m });
 };

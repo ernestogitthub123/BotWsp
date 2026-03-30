@@ -21,6 +21,7 @@ let usarCodigo = false;
 let numero = "";
 const BOOT_MESSAGE_GRACE_MS = 5_000;
 const HANG_TIMEOUT_MS = 8 * 60 * 1000;
+const OPEN_TIMEOUT_MS = 45 * 1000;
 
 // --- Detector de spam de "ekey bundle" ---
 let spamCount = 0;
@@ -113,7 +114,9 @@ setTimeout(cargarSubbots, 60 * 1000);
 
 async function startBot() {
 const bootStartedAt = Date.now();
+const bootCutoffSeconds = Math.floor((bootStartedAt - BOOT_MESSAGE_GRACE_MS) / 1000);
 let lastSocketActivity = Date.now();
+let connectionOpened = false;
 const { state, saveCreds } = await baileys.useMultiFileAuthState(BOT_SESSION_FOLDER);
 const msgRetryCounterMap = new Map();
 const msgRetryCounterCache = new NodeCache({ stdTTL: 0, checkperiod: 0 }); 
@@ -153,17 +156,22 @@ lastSocketActivity = Date.now();
 };
 
 const watchdog = setInterval(() => {
+if (!connectionOpened) return;
 if (Date.now() - lastSocketActivity > HANG_TIMEOUT_MS) {
 console.log(chalk.yellow("⚠️ Sin actividad del socket por demasiado tiempo. Reiniciando bot..."));
 process.exit(1);
 }
 }, 60_000);
-
-if (sock.ws && typeof sock.ws.on === 'function') {
-for (const eventName of ['open', 'close', 'error', 'message', 'ping', 'pong']) {
-sock.ws.on(eventName, touchSocketActivity);
+const openTimeout = setTimeout(() => {
+if (!connectionOpened) {
+console.log(chalk.yellow("⚠️ El socket no terminó de abrir a tiempo. Reiniciando conexión..."));
+try {
+sock.end(new Error('open timeout'));
+} catch {
+process.exit(1);
 }
 }
+}, OPEN_TIMEOUT_MS);
 
 globalThis.conn = sock;
 setupGroupEvents(sock);
@@ -175,12 +183,19 @@ return saveCreds();
 sock.ev.on("connection.update", async ({ connection, lastDisconnect }) => {
 touchSocketActivity();
 const code = lastDisconnect?.error?.output?.statusCode || 0;
+if (connection) {
+console.log(`[CONN][main] state=${connection} code=${code}`);
+}
 
 if (connection === "open") {
+connectionOpened = true;
+clearTimeout(openTimeout);
 console.log(chalk.bold.greenBright('\n▣─────────────────────────────···\n│\n│❧ 𝙲𝙾𝙽𝙴𝙲𝚃𝙰𝙳𝙾 𝙲𝙾𝚁𝚁𝙴𝙲𝚃𝙰𝙼𝙴𝙽𝚃𝙴 𝙰𝙻 𝚆𝙷𝙰𝚃𝚂𝙰𝙿𝙿 ✅\n│\n▣─────────────────────────────···'))
 }
 
 if (connection === "close") {
+connectionOpened = false;
+clearTimeout(openTimeout);
 clearInterval(watchdog);
 if ([401, 440, 428, 405].includes(code)) {      
 console.log(chalk.red(`❌ Error de sesión (${code}) inválida. Borra la carpeta "BotSession" y vuelve a conectar.`));
@@ -207,7 +222,8 @@ console.log(`[UPSERT][main] type=${type} count=${messages?.length || 0}`);
 for (const msg of messages) {
 if (!msg.message) continue;
 const rawTimestamp = Number(msg.messageTimestamp || 0);
-if (rawTimestamp && rawTimestamp * 1000 < bootStartedAt - BOOT_MESSAGE_GRACE_MS) {
+const normalizedTimestampSeconds = rawTimestamp > 1e12 ? Math.floor(rawTimestamp / 1000) : rawTimestamp;
+if (normalizedTimestampSeconds && normalizedTimestampSeconds < bootCutoffSeconds) {
   console.log(`[UPSERT][main][skip-backlog] id=${msg.key?.id || ''} ts=${rawTimestamp}`);
   continue;
 }
