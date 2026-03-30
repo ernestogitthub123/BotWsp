@@ -1,5 +1,6 @@
 import { createLoveSticker } from '../lib/love-sticker.js'
 import { addExif } from '../lib/sticker.js'
+import { enforceStickerCooldown } from '../lib/sticker-cooldown.js'
 
 function parseCouple(text = '') {
   const parts = String(text).split(/\s+x\s+/i)
@@ -22,8 +23,21 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
   const percent = Math.floor(Math.random() * 100) + 1
 
   try {
+    if (!await enforceStickerCooldown(m, 'crear otro sticker de ship')) {
+      return
+    }
+
     const webpBuffer = await createLoveSticker(name1, name2, percent)
-    const sticker = await addExif(webpBuffer, global.info?.packname || 'LoliBot', global.info?.author || 'LoliBot')
+    let sticker = webpBuffer
+
+    try {
+      const exifSticker = await addExif(webpBuffer, global.info?.packname || 'LoliBot', global.info?.author || 'LoliBot')
+      if (Buffer.isBuffer(exifSticker) && exifSticker.length > 0) {
+        sticker = exifSticker
+      }
+    } catch (exifError) {
+      console.error('Error agregando EXIF a nivelamor:', exifError)
+    }
 
     await conn.sendFile(m.chat, sticker, 'nivelamor.webp', '', m, true, { quoted: m })
 

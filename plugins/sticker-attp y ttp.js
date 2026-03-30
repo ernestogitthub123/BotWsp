@@ -1,5 +1,6 @@
 import { textToSticker, textToAnimatedSticker, textToAttpSticker } from '../lib/text2sticker.js'
 import { db } from '../lib/postgres.js'
+import { enforceStickerCooldown } from '../lib/sticker-cooldown.js'
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
   try {
@@ -12,6 +13,10 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     if (!text) {
       return m.reply(`Escribe el texto para convertirlo en sticker.\nEjemplo:\n*${usedPrefix + command}* Nuevo Sticker`)
+    }
+
+    if (!await enforceStickerCooldown(m, 'crear otro sticker')) {
+      return
     }
 
     void f
@@ -40,8 +45,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
           paddingX: 28,
           paddingY: 36,
           bgColor: '#000000',
-          delay: 55,
-          cycles: 5
+          delay: 60,
+          cycles: 1,
+          maxPaletteFrames: 4
         })
 
         return conn.sendFile(m.chat, webpBuffer, 'sticker.webp', '', m, true, {
@@ -122,11 +128,12 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
           bgColor: '#ffffff',
           textColor: '#000000',
           align: 'left',
-          delay: 85,
-          transitionFrames: 5,
-          holdFrames: 1,
-          finalHoldFrames: 8,
-          mode: 'assemble'
+          delay: 72,
+          transitionFrames: 2,
+          holdFrames: 0,
+          finalHoldFrames: 3,
+          mode: 'assemble',
+          maxAssembleSteps: 5
         })
 
         return conn.sendFile(m.chat, webpBuffer, 'sticker.webp', '', m, true, {
@@ -167,10 +174,10 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
           bgColor: '#000000',
           textColor: '#ffffff',
           align: 'center',
-          delay: 78,
-          transitionFrames: 8,
-          holdFrames: 6,
-          finalHoldFrames: 12,
+          delay: 70,
+          transitionFrames: 4,
+          holdFrames: 1,
+          finalHoldFrames: 3,
           mode: 'glitch',
           palette: ['#ffffff', '#00e5ff', '#ff4d9d', '#ffe14d', '#7dff7a']
         })

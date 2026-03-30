@@ -3,6 +3,7 @@ import uploadFile from '../lib/uploadFile.js'
 import uploadImage from '../lib/uploadImage.js'
 import { webp2png } from '../lib/webp2mp4.js'
 import { db } from '../lib/postgres.js';
+import { enforceStickerCooldown } from '../lib/sticker-cooldown.js'
 
 let handler = async (m, { conn, args, usedPrefix, command }) => {
 const userResult = await db.query('SELECT sticker_packname, sticker_author FROM usuarios WHERE id = $1', [m.sender]);
@@ -11,6 +12,7 @@ let stiker = false;
 let f = user.sticker_packname || global.info.packname;
 let g = (user.sticker_packname && user.sticker_author ? user.sticker_author : (user.sticker_packname && !user.sticker_author ? '' : global.info.author));
 try {
+if (!await enforceStickerCooldown(m, 'crear otro sticker')) return
 let q = m.quoted ? m.quoted : m
 let mime = (q.msg || q).mimetype || q.mediaType || ''
 if (/webp|image|video/g.test(mime)) {

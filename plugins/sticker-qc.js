@@ -1,11 +1,13 @@
 import { sticker } from '../lib/sticker.js';
 import { db } from '../lib/postgres.js';
 import axios from 'axios';
+import { enforceStickerCooldown } from '../lib/sticker-cooldown.js'
 const handler = async (m, {conn, args, usedPrefix, command}) => {
 const userResult = await db.query('SELECT sticker_packname, sticker_author FROM usuarios WHERE id = $1', [m.sender]);
 const user = userResult.rows[0] || {};
 let f = user.sticker_packname || global.info.packname;
 let g = (user.sticker_packname && user.sticker_author ? user.sticker_author : (user.sticker_packname && !user.sticker_author ? '' : global.info.author));
+if (!await enforceStickerCooldown(m, 'crear otro sticker')) return
 let text
 if (args.length >= 1) {
 text = args.slice(0).join(" ");
